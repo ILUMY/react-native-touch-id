@@ -25,6 +25,8 @@ public class FingerprintDialog extends DialogFragment implements FingerprintHand
     private String authReason;
     private int dialogColor = 0;
     private String dialogTitle = "";
+    private String cancelText = "";
+    private String sensorDescription = "";
 
     @Override
     public void onAttach(Context context) {
@@ -52,7 +54,11 @@ public class FingerprintDialog extends DialogFragment implements FingerprintHand
             mFingerprintImage.setColorFilter(this.dialogColor);
         }
 
+        final TextView mFingerprintSensorDescription = (TextView) v.findViewById(R.id.fingerprint_sensor_description);
+        mFingerprintSensorDescription.setText(this.sensorDescription);
+
         final Button mCancelButton = (Button) v.findViewById(R.id.cancel_button);
+        mCancelButton.setText(this.cancelText);
         mCancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -120,6 +126,12 @@ public class FingerprintDialog extends DialogFragment implements FingerprintHand
         if (config.hasKey("title")) {
             this.dialogTitle = config.getString("title");
         }
+        if (config.hasKey("cancelText")) {
+            this.cancelText = config.getString("cancelText");
+        }
+        if (config.hasKey("sensorDescription")) {
+            this.sensorDescription = config.getString("sensorDescription");
+        }
 
         if (config.hasKey("color")) {
             this.dialogColor = config.getInt("color");
@@ -129,7 +141,7 @@ public class FingerprintDialog extends DialogFragment implements FingerprintHand
     public interface DialogResultListener {
         void onAuthenticated();
 
-        void onError(String errorString);
+        void onError(String errorString, int errorCode);
 
         void onCancelled();
     }
@@ -142,9 +154,9 @@ public class FingerprintDialog extends DialogFragment implements FingerprintHand
     }
 
     @Override
-    public void onError(String errorString) {
+    public void onError(String errorString, int errorCode) {
         this.isAuthInProgress = false;
-        this.dialogCallback.onError(errorString);
+        this.dialogCallback.onError(errorString, errorCode);
         dismiss();
     }
 
